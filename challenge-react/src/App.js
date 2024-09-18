@@ -4,55 +4,25 @@ import { useDispatch } from 'react-redux';
 import { summaryDonations } from './helpers';
 import DonationAmountDisplay from './components/DonationAmountDisplay';
 import DonationPayment from './components/DonationPayment';
-
+import { absoluteCard, buttonAnimation } from './style_constant';
+import { ToastComponent } from './components/ToastComponent';
 function App() {
+  const currency = 'THB';
   const dispatch = useDispatch();
   const [isLoading, setIsLoading] = useState(false);
-  const [charitiesData, setCharitiesData] = useState([
-    {
-      id: 1,
-      name: 'Baan Kru Noi',
-      image: 'baan-kru-noi.jpg',
-      currency: 'THB',
-    },
-    {
-      id: 2,
-      name: 'Habitat for Humanity Thailand',
-      image: 'habitat-for-humanity-thailand.jpg',
-      currency: 'THB',
-    },
-    {
-      id: 3,
-      name: 'Paper Ranger',
-      image: 'paper-ranger.jpg',
-      currency: 'THB',
-    },
-    {
-      id: 4,
-      name: 'Makhampom Theater',
-      image: 'makhampom-theater.jpg',
-      currency: 'THB',
-    },
-    {
-      id: 5,
-      name: 'Thailand Association of the Blind',
-      image: 'thailand-association-of-the-blind.jpg',
-      currency: 'THB',
-    },
-  ]);
-  const [selectedCharities, setSelectedCharities] = useState(1);
+  const [incrementId, setIncrementId] = useState(1);
+  const [charitiesData, setCharitiesData] = useState();
+  const [selectedCharities, setSelectedCharities] = useState();
   const [selectedAmount, setSelectedAmount] = useState();
 
   const getCharitiesData = async () => {
     try {
       setIsLoading(true);
-      const response = await axios.get('http://localhost:3001/charities');
-      setCharitiesData(response.data);
+      const { data } = await axios.get('http://localhost:3001/charities');
+      setCharitiesData(data);
       setIsLoading(false);
-      return response;
     } catch (error) {
-      setIsLoading(false);
-      console.error('Error fetching charities', error);
+      ToastComponent('Error fetching charities', 'error');
       throw error;
     }
   };
@@ -60,72 +30,119 @@ function App() {
   const getPayment = async () => {
     try {
       const { data } = await axios.get('http://localhost:3001/payments');
-      console.log({ getPayment: data });
-      dispatch({
-        type: 'UPDATE_TOTAL_DONATE',
-        amount: summaryDonations(data.map((item) => item.amount)),
-      });
-      return data;
+      if (data.length > 0) {
+        const sortData = data.sort((a, b) => b.id - a.id);
+        setIncrementId(sortData[0].id + 1);
+        dispatch({
+          type: 'UPDATE_TOTAL_DONATE',
+          amount: summaryDonations(data.map((item) => item.amount)),
+        });
+      }
     } catch (error) {
       setIsLoading(false);
-      console.error('Error fetching charities', error);
+      ToastComponent('Error fetching payment', 'error');
       throw error;
     }
   };
+
+  async function handlePay(id, amount, currency) {
+    try {
+      const response = await axios.post('http://localhost:3001/payments', {
+        charitiesId: id,
+        amount: amount,
+        currency: currency,
+        id: incrementId,
+      });
+      if (response.status === 201) {
+        setIncrementId(incrementId + 1);
+        setSelectedAmount(null);
+        setSelectedCharities(null);
+        dispatch({
+          type: 'UPDATE_TOTAL_DONATE',
+          amount: amount,
+        });
+        ToastComponent('Payment successful', 'success');
+        dispatch({
+          type: 'UPDATE_MESSAGE',
+          message: 'Payment successful',
+        });
+      }
+    } catch (error) {
+      ToastComponent('Error to create payment', 'error');
+      throw error;
+    }
+  }
 
   useEffect(() => {
     getPayment();
     getCharitiesData();
   }, []);
 
-  useEffect(() => {
-    setIsLoading(false);
-    console.log({ charitiesData });
-  }, [charitiesData]);
-
   return (
-    <div className="flex flex-col bg-red-200 lg:bg-[#F3F2EC] justify-center items-center px-10 lg:px-40 py-20">
-      <h1 className="font-semibold">Omise Tamboon React</h1>
+    <div className="flex flex-col items-center justify-center px-10 py-20 xl:px-40">
+      <h1 className="font-semibold text-primary">Omise Tamboon React</h1>
       <div className="my-10">
         <DonationAmountDisplay />
       </div>
       {isLoading || !charitiesData ? (
         <>isLoading...</>
       ) : (
-        <div className="grid grid-cols-1 gap-10 xl:grid-cols-2">
-          {charitiesData.map((item, index) => (
-            <div
-              className="flex flex-col relative w-full shadow-md overflow-hidden rounded-xl"
-              key={index}
-            >
+        <div className="grid grid-cols-1 gap-10 lg:grid-cols-2">
+          {charitiesData.map((item, index) => {
+            const isSelected = selectedCharities === item.id ? '' : 'hidden';
+            const cardClasses = `${absoluteCard} bg-white opacity-80 ${isSelected}`;
+            const closeButtonClasses = `absolute h-16 w-16 lg:h-10 lg:w-10 right-0 z-10 mb-4 lg:m-2 cursor-pointer rounded-full p-2 hover:bg-gray-400 ${buttonAnimation} ${isSelected}`;
+            const contentClasses = `${absoluteCard} flex flex-col items-center justify-center p-10 ${isSelected}`;
+
+            return (
               <div
-                className={`absolute inset-0 w-full h-full bg-white opacity-80 ${item.id === selectedCharities ? '' : 'hidden'}`}
-              />
-              <DonationPayment
-                item={item}
-                selectedAmount={selectedAmount}
-                setSelectedAmount={setSelectedAmount}
-                selectedCharities={selectedCharities}
-                setSelectedCharities={setSelectedCharities}
-              />
-              <div className="flex-1">
+                className="relative flex w-full h-full flex-col overflow-hidden rounded-xl shadow-md"
+                key={index}
+              >
+                <div className={cardClasses} />
                 <img
-                  src={`images/${item.image}`}
-                  alt={item.image}
-                  className="h-full w-full object-top object-cover"
+                  src="icons/close_icon.svg"
+                  alt="close_icon"
+                  className={closeButtonClasses}
+                  onClick={() => setSelectedCharities(null)}
+                  draggable="false"
                 />
+                <div className={contentClasses}>
+                  <DonationPayment
+                    currency={currency}
+                    handlePay={() =>
+                      selectedAmount
+                        ? handlePay(selectedCharities, selectedAmount, currency)
+                        : ToastComponent('Please select amount', 'error')
+                    }
+                    selectedAmount={selectedAmount}
+                    setSelectedAmount={setSelectedAmount}
+                  />
+                </div>
+                <div className="flex-1">
+                  <img
+                    src={`images/${item.image}`}
+                    alt={item.image}
+                    className="h-full w-full object-cover object-top aspect-video"
+                  />
+                </div>
+                <div className="flex h-40 lg:h-24 flex-row justify-between gap-4 overflow-hidden bg-white p-6 lg:p-4">
+                  <h4 className=" line-clamp-2 h-max break-word">
+                    {item.name}
+                  </h4>
+                  <button
+                    className="hover:text-secondary h-max rounded-full border border-primary px-8 py-6 lg:px-3 lg:py-1 text-lg text-primary"
+                    onClick={() => {
+                      setSelectedAmount(null);
+                      setSelectedCharities(item.id);
+                    }}
+                  >
+                    <h4>Donate</h4>
+                  </button>
+                </div>
               </div>
-              <div className="bg-white h-24 p-4 flex flex-row justify-between overflow-hidden gap-4">
-                <h4 className=" line-clamp-2 break-all h-max">{item.name}</h4>
-                <button
-                  className="py-1 text-primary hover:text-secondary px-3 text-lg h-max border-primary border rounded-full"
-                  onClick={() => setSelectedCharities(item.id)}
-                >
-                  Donate
-                </button>
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
     </div>

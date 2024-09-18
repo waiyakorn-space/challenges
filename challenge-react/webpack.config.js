@@ -28,15 +28,15 @@ const config = {
         },
       },
       {
-        test: /\.css$/,
+        test: /\.css$/i, // To handle .css files
         use: [
-          'style-loader',
-          'css-loader',
+          'style-loader', // Injects CSS into the DOM
+          'css-loader', // Resolves @import and url() paths
           {
-            loader: 'postcss-loader',
+            loader: 'postcss-loader', // PostCSS loader
             options: {
               postcssOptions: {
-                plugins: ['tailwindcss', 'autoprefixer'],
+                plugins: [require('tailwindcss'), require('autoprefixer')],
               },
             },
           },
