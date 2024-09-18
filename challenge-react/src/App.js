@@ -1,111 +1,135 @@
-import React, { Component } from 'react';
-import fetch from 'isomorphic-fetch';
-import styled from 'styled-components';
-import { connect } from 'react-redux';
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
+import { useDispatch } from 'react-redux';
 import { summaryDonations } from './helpers';
+import DonationAmountDisplay from './components/DonationAmountDisplay';
+import DonationPayment from './components/DonationPayment';
 
-const Card = styled.div`
-  margin: 10px;
-  border: 1px solid #ccc;
-`;
+function App() {
+  const dispatch = useDispatch();
+  const [isLoading, setIsLoading] = useState(false);
+  const [charitiesData, setCharitiesData] = useState([
+    {
+      id: 1,
+      name: 'Baan Kru Noi',
+      image: 'baan-kru-noi.jpg',
+      currency: 'THB',
+    },
+    {
+      id: 2,
+      name: 'Habitat for Humanity Thailand',
+      image: 'habitat-for-humanity-thailand.jpg',
+      currency: 'THB',
+    },
+    {
+      id: 3,
+      name: 'Paper Ranger',
+      image: 'paper-ranger.jpg',
+      currency: 'THB',
+    },
+    {
+      id: 4,
+      name: 'Makhampom Theater',
+      image: 'makhampom-theater.jpg',
+      currency: 'THB',
+    },
+    {
+      id: 5,
+      name: 'Thailand Association of the Blind',
+      image: 'thailand-association-of-the-blind.jpg',
+      currency: 'THB',
+    },
+  ]);
+  const [selectedCharities, setSelectedCharities] = useState(1);
+  const [selectedAmount, setSelectedAmount] = useState();
 
-export default connect((state) => state)(
-  class App extends Component {
-    state = {
-      charities: [],
-      selectedAmount: 10,
-    };
-
-    componentDidMount() {
-      const self = this;
-      fetch('http://localhost:3001/charities')
-        .then(function (resp) {
-          return resp.json();
-        })
-        .then(function (data) {
-          self.setState({ charities: data });
-        });
-
-      fetch('http://localhost:3001/payments')
-        .then(function (resp) {
-          return resp.json();
-        })
-        .then(function (data) {
-          self.props.dispatch({
-            type: 'UPDATE_TOTAL_DONATE',
-            amount: summaryDonations(data.map((item) => item.amount)),
-          });
-        });
+  const getCharitiesData = async () => {
+    try {
+      setIsLoading(true);
+      const response = await axios.get('http://localhost:3001/charities');
+      setCharitiesData(response.data);
+      setIsLoading(false);
+      return response;
+    } catch (error) {
+      setIsLoading(false);
+      console.error('Error fetching charities', error);
+      throw error;
     }
+  };
 
-    render() {
-      const self = this;
-      const cards = this.state.charities.map(function (item, i) {
-        const payments = [10, 20, 50, 100, 500].map((amount, j) => (
-          <label key={j}>
-            <input
-              type="radio"
-              name="payment"
-              onClick={function () {
-                self.setState({ selectedAmount: amount });
-              }}
-            />
-            {amount}
-          </label>
-        ));
-
-        return (
-          <Card key={i}>
-            <p>{item.name}</p>
-            {payments}
-            <button
-              onClick={handlePay.call(
-                self,
-                item.id,
-                self.state.selectedAmount,
-                item.currency
-              )}
-            >
-              Pay
-            </button>
-          </Card>
-        );
+  const getPayment = async () => {
+    try {
+      const { data } = await axios.get('http://localhost:3001/payments');
+      console.log({ getPayment: data });
+      dispatch({
+        type: 'UPDATE_TOTAL_DONATE',
+        amount: summaryDonations(data.map((item) => item.amount)),
       });
-
-      const style = {
-        color: 'red',
-        margin: '1em 0',
-        fontWeight: 'bold',
-        fontSize: '16px',
-        textAlign: 'center',
-      };
-
-      const donate = this.props.donate;
-      const message = this.props.message;
-
-      return (
-        <div>
-          <h1>Tamboon React</h1>
-          <p>All donations: {donate}</p>
-          <p style={style}>{message}</p>
-          {cards}
-        </div>
-      );
+      return data;
+    } catch (error) {
+      setIsLoading(false);
+      console.error('Error fetching charities', error);
+      throw error;
     }
-  }
-);
+  };
 
-/**
- * Handle pay button
- * 
- * @param {*} The charities Id
- * @param {*} amount The amount was selected
- * @param {*} currency The currency
- * 
- * @example
- * fetch('http://localhost:3001/payments', {
-      method: 'POST',
-      body: `{ "charitiesId": ${id}, "amount": ${amount}, "currency": "${currency}" }`,
-    })
- */
-function handlePay(id, amount, currency) {}
+  useEffect(() => {
+    getPayment();
+    getCharitiesData();
+  }, []);
+
+  useEffect(() => {
+    setIsLoading(false);
+    console.log({ charitiesData });
+  }, [charitiesData]);
+
+  return (
+    <div className="flex flex-col bg-red-200 lg:bg-[#F3F2EC] justify-center items-center px-10 lg:px-40 py-20">
+      <h1 className="font-semibold">Omise Tamboon React</h1>
+      <div className="my-10">
+        <DonationAmountDisplay />
+      </div>
+      {isLoading || !charitiesData ? (
+        <>isLoading...</>
+      ) : (
+        <div className="grid grid-cols-1 gap-10 xl:grid-cols-2">
+          {charitiesData.map((item, index) => (
+            <div
+              className="flex flex-col relative w-full shadow-md overflow-hidden rounded-xl"
+              key={index}
+            >
+              <div
+                className={`absolute inset-0 w-full h-full bg-white opacity-80 ${item.id === selectedCharities ? '' : 'hidden'}`}
+              />
+              <DonationPayment
+                item={item}
+                selectedAmount={selectedAmount}
+                setSelectedAmount={setSelectedAmount}
+                selectedCharities={selectedCharities}
+                setSelectedCharities={setSelectedCharities}
+              />
+              <div className="flex-1">
+                <img
+                  src={`images/${item.image}`}
+                  alt={item.image}
+                  className="h-full w-full object-top object-cover"
+                />
+              </div>
+              <div className="bg-white h-24 p-4 flex flex-row justify-between overflow-hidden gap-4">
+                <h4 className=" line-clamp-2 break-all h-max">{item.name}</h4>
+                <button
+                  className="py-1 text-primary hover:text-secondary px-3 text-lg h-max border-primary border rounded-full"
+                  onClick={() => setSelectedCharities(item.id)}
+                >
+                  Donate
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+export default App;
