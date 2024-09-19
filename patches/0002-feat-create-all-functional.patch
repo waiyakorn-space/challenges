@@ -1,0 +1,695 @@
+From 7db139d91dd4f15743a30ad535b346741ae69c9e Mon Sep 17 00:00:00 2001
+From: Waiyakorn <waiyakorn.p@ticketmelon.com>
+Date: Wed, 18 Sep 2024 23:36:07 +0700
+Subject: [PATCH 2/4] feat: create all functional
+
+---
+ challenge-react/db.json                       | 122 +++++++++++-
+ challenge-react/package.json                  |   1 +
+ challenge-react/public/icons/circle-check.svg |   1 +
+ challenge-react/public/icons/circle-x.svg     |   1 +
+ challenge-react/src/App.js                    | 183 ++++++++++--------
+ .../src/components/DonationPayment.js         |  72 +++----
+ .../src/components/ToastComponent.js          |  32 +++
+ challenge-react/src/index.css                 |   8 +-
+ challenge-react/src/index.js                  |  15 ++
+ challenge-react/src/style_constant.js         |   6 +-
+ challenge-react/tailwind.config.js            |   8 +-
+ challenge-react/webpack.config.js             |  10 +-
+ challenge-react/yarn.lock                     |  12 ++
+ 13 files changed, 322 insertions(+), 149 deletions(-)
+ create mode 100644 challenge-react/public/icons/circle-check.svg
+ create mode 100644 challenge-react/public/icons/circle-x.svg
+ create mode 100644 challenge-react/src/components/ToastComponent.js
+
+diff --git a/challenge-react/db.json b/challenge-react/db.json
+index 09e6bf7..1d9714c 100644
+--- a/challenge-react/db.json
++++ b/challenge-react/db.json
+@@ -67,6 +67,126 @@
+       "amount": 500,
+       "currency": "THB",
+       "id": 6
++    },
++    {
++      "charitiesId": 1,
++      "amount": 500,
++      "currency": "THB",
++      "id": 7
++    },
++    {
++      "charitiesId": 1,
++      "amount": 100,
++      "currency": "THB",
++      "id": 8
++    },
++    {
++      "charitiesId": 1,
++      "amount": 20,
++      "currency": "THB",
++      "id": 9
++    },
++    {
++      "charitiesId": 1,
++      "amount": 10,
++      "currency": "THB",
++      "id": 10
++    },
++    {
++      "charitiesId": 5,
++      "amount": 10,
++      "currency": "THB",
++      "id": 11
++    },
++    {
++      "charitiesId": 2,
++      "amount": 20,
++      "currency": "THB",
++      "id": 12
++    },
++    {
++      "charitiesId": 1,
++      "amount": 100,
++      "currency": "THB",
++      "id": 13
++    },
++    {
++      "charitiesId": 1,
++      "amount": 10,
++      "currency": "THB",
++      "id": 14
++    },
++    {
++      "charitiesId": 5,
++      "amount": 500,
++      "currency": "THB",
++      "id": 15
++    },
++    {
++      "charitiesId": 4,
++      "amount": 500,
++      "currency": "THB",
++      "id": 16
++    },
++    {
++      "charitiesId": 1,
++      "amount": 500,
++      "currency": "THB",
++      "id": 17
++    },
++    {
++      "charitiesId": 1,
++      "amount": 100,
++      "currency": "THB",
++      "id": 18
++    },
++    {
++      "charitiesId": 2,
++      "amount": 50,
++      "currency": "THB",
++      "id": 19
++    },
++    {
++      "charitiesId": 3,
++      "amount": 20,
++      "currency": "THB",
++      "id": 20
++    },
++    {
++      "charitiesId": 4,
++      "amount": 20,
++      "currency": "THB",
++      "id": 21
++    },
++    {
++      "charitiesId": 1,
++      "amount": 20,
++      "currency": "THB",
++      "id": 22
++    },
++    {
++      "charitiesId": 1,
++      "amount": 100,
++      "currency": "THB",
++      "id": 23
++    },
++    {
++      "charitiesId": 1,
++      "amount": 500,
++      "currency": "THB",
++      "id": 24
++    },
++    {
++      "charitiesId": 1,
++      "amount": 500,
++      "currency": "THB",
++      "id": 25
++    },
++    {
++      "charitiesId": 4,
++      "amount": 500,
++      "currency": "THB",
++      "id": 26
+     }
+   ]
+-}
++}
+\ No newline at end of file
+diff --git a/challenge-react/package.json b/challenge-react/package.json
+index cc8fe4b..e98b70b 100644
+--- a/challenge-react/package.json
++++ b/challenge-react/package.json
+@@ -25,6 +25,7 @@
+     "react": "^17.0.1",
+     "react-dom": "^17.0.1",
+     "react-redux": "^7.2.2",
++    "react-toastify": "8.0.3",
+     "redux": "^4.0.5",
+     "styled-components": "^5.2.1",
+     "tailwindcss": "^3.4.12"
+diff --git a/challenge-react/public/icons/circle-check.svg b/challenge-react/public/icons/circle-check.svg
+new file mode 100644
+index 0000000..74f8bae
+--- /dev/null
++++ b/challenge-react/public/icons/circle-check.svg
+@@ -0,0 +1 @@
++<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-circle-check"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>
+\ No newline at end of file
+diff --git a/challenge-react/public/icons/circle-x.svg b/challenge-react/public/icons/circle-x.svg
+new file mode 100644
+index 0000000..d1cdfcd
+--- /dev/null
++++ b/challenge-react/public/icons/circle-x.svg
+@@ -0,0 +1 @@
++<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-circle-x"><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6"/><path d="m9 9 6 6"/></svg>
+\ No newline at end of file
+diff --git a/challenge-react/src/App.js b/challenge-react/src/App.js
+index c50a83d..4fd7e61 100644
+--- a/challenge-react/src/App.js
++++ b/challenge-react/src/App.js
+@@ -4,55 +4,25 @@ import { useDispatch } from 'react-redux';
+ import { summaryDonations } from './helpers';
+ import DonationAmountDisplay from './components/DonationAmountDisplay';
+ import DonationPayment from './components/DonationPayment';
+-
++import { absoluteCard, buttonAnimation } from './style_constant';
++import { ToastComponent } from './components/ToastComponent';
+ function App() {
++  const currency = 'THB';
+   const dispatch = useDispatch();
+   const [isLoading, setIsLoading] = useState(false);
+-  const [charitiesData, setCharitiesData] = useState([
+-    {
+-      id: 1,
+-      name: 'Baan Kru Noi',
+-      image: 'baan-kru-noi.jpg',
+-      currency: 'THB',
+-    },
+-    {
+-      id: 2,
+-      name: 'Habitat for Humanity Thailand',
+-      image: 'habitat-for-humanity-thailand.jpg',
+-      currency: 'THB',
+-    },
+-    {
+-      id: 3,
+-      name: 'Paper Ranger',
+-      image: 'paper-ranger.jpg',
+-      currency: 'THB',
+-    },
+-    {
+-      id: 4,
+-      name: 'Makhampom Theater',
+-      image: 'makhampom-theater.jpg',
+-      currency: 'THB',
+-    },
+-    {
+-      id: 5,
+-      name: 'Thailand Association of the Blind',
+-      image: 'thailand-association-of-the-blind.jpg',
+-      currency: 'THB',
+-    },
+-  ]);
+-  const [selectedCharities, setSelectedCharities] = useState(1);
++  const [incrementId, setIncrementId] = useState(1);
++  const [charitiesData, setCharitiesData] = useState();
++  const [selectedCharities, setSelectedCharities] = useState();
+   const [selectedAmount, setSelectedAmount] = useState();
+ 
+   const getCharitiesData = async () => {
+     try {
+       setIsLoading(true);
+-      const response = await axios.get('http://localhost:3001/charities');
+-      setCharitiesData(response.data);
++      const { data } = await axios.get('http://localhost:3001/charities');
++      setCharitiesData(data);
+       setIsLoading(false);
+-      return response;
+     } catch (error) {
+-      setIsLoading(false);
+-      console.error('Error fetching charities', error);
++      ToastComponent('Error fetching charities', 'error');
+       throw error;
+     }
+   };
+@@ -60,72 +30,119 @@ function App() {
+   const getPayment = async () => {
+     try {
+       const { data } = await axios.get('http://localhost:3001/payments');
+-      console.log({ getPayment: data });
+-      dispatch({
+-        type: 'UPDATE_TOTAL_DONATE',
+-        amount: summaryDonations(data.map((item) => item.amount)),
+-      });
+-      return data;
++      if (data.length > 0) {
++        const sortData = data.sort((a, b) => b.id - a.id);
++        setIncrementId(sortData[0].id + 1);
++        dispatch({
++          type: 'UPDATE_TOTAL_DONATE',
++          amount: summaryDonations(data.map((item) => item.amount)),
++        });
++      }
+     } catch (error) {
+       setIsLoading(false);
+-      console.error('Error fetching charities', error);
++      ToastComponent('Error fetching payment', 'error');
+       throw error;
+     }
+   };
+ 
++  async function handlePay(id, amount, currency) {
++    try {
++      const response = await axios.post('http://localhost:3001/payments', {
++        charitiesId: id,
++        amount: amount,
++        currency: currency,
++        id: incrementId,
++      });
++      if (response.status === 201) {
++        setIncrementId(incrementId + 1);
++        setSelectedAmount(null);
++        setSelectedCharities(null);
++        dispatch({
++          type: 'UPDATE_TOTAL_DONATE',
++          amount: amount,
++        });
++        ToastComponent('Payment successful', 'success');
++        dispatch({
++          type: 'UPDATE_MESSAGE',
++          message: 'Payment successful',
++        });
++      }
++    } catch (error) {
++      ToastComponent('Error to create payment', 'error');
++      throw error;
++    }
++  }
++
+   useEffect(() => {
+     getPayment();
+     getCharitiesData();
+   }, []);
+ 
+-  useEffect(() => {
+-    setIsLoading(false);
+-    console.log({ charitiesData });
+-  }, [charitiesData]);
+-
+   return (
+-    <div className="flex flex-col bg-red-200 lg:bg-[#F3F2EC] justify-center items-center px-10 lg:px-40 py-20">
+-      <h1 className="font-semibold">Omise Tamboon React</h1>
++    <div className="flex flex-col items-center justify-center px-10 py-20 xl:px-40">
++      <h1 className="font-semibold text-primary">Omise Tamboon React</h1>
+       <div className="my-10">
+         <DonationAmountDisplay />
+       </div>
+       {isLoading || !charitiesData ? (
+         <>isLoading...</>
+       ) : (
+-        <div className="grid grid-cols-1 gap-10 xl:grid-cols-2">
+-          {charitiesData.map((item, index) => (
+-            <div
+-              className="flex flex-col relative w-full shadow-md overflow-hidden rounded-xl"
+-              key={index}
+-            >
++        <div className="grid grid-cols-1 gap-10 lg:grid-cols-2">
++          {charitiesData.map((item, index) => {
++            const isSelected = selectedCharities === item.id ? '' : 'hidden';
++            const cardClasses = `${absoluteCard} bg-white opacity-80 ${isSelected}`;
++            const closeButtonClasses = `absolute h-16 w-16 lg:h-10 lg:w-10 right-0 z-10 mb-4 lg:m-2 cursor-pointer rounded-full p-2 hover:bg-gray-400 ${buttonAnimation} ${isSelected}`;
++            const contentClasses = `${absoluteCard} flex flex-col items-center justify-center p-10 ${isSelected}`;
++
++            return (
+               <div
+-                className={`absolute inset-0 w-full h-full bg-white opacity-80 ${item.id === selectedCharities ? '' : 'hidden'}`}
+-              />
+-              <DonationPayment
+-                item={item}
+-                selectedAmount={selectedAmount}
+-                setSelectedAmount={setSelectedAmount}
+-                selectedCharities={selectedCharities}
+-                setSelectedCharities={setSelectedCharities}
+-              />
+-              <div className="flex-1">
++                className="relative flex w-full h-full flex-col overflow-hidden rounded-xl shadow-md"
++                key={index}
++              >
++                <div className={cardClasses} />
+                 <img
+-                  src={`images/${item.image}`}
+-                  alt={item.image}
+-                  className="h-full w-full object-top object-cover"
++                  src="icons/close_icon.svg"
++                  alt="close_icon"
++                  className={closeButtonClasses}
++                  onClick={() => setSelectedCharities(null)}
++                  draggable="false"
+                 />
++                <div className={contentClasses}>
++                  <DonationPayment
++                    currency={currency}
++                    handlePay={() =>
++                      selectedAmount
++                        ? handlePay(selectedCharities, selectedAmount, currency)
++                        : ToastComponent('Please select amount', 'error')
++                    }
++                    selectedAmount={selectedAmount}
++                    setSelectedAmount={setSelectedAmount}
++                  />
++                </div>
++                <div className="flex-1">
++                  <img
++                    src={`images/${item.image}`}
++                    alt={item.image}
++                    className="h-full w-full object-cover object-top aspect-video"
++                  />
++                </div>
++                <div className="flex h-40 lg:h-24 flex-row justify-between gap-4 overflow-hidden bg-white p-6 lg:p-4">
++                  <h4 className=" line-clamp-2 h-max break-word">
++                    {item.name}
++                  </h4>
++                  <button
++                    className="hover:text-secondary h-max rounded-full border border-primary px-8 py-6 lg:px-3 lg:py-1 text-lg text-primary"
++                    onClick={() => {
++                      setSelectedAmount(null);
++                      setSelectedCharities(item.id);
++                    }}
++                  >
++                    <h4>Donate</h4>
++                  </button>
++                </div>
+               </div>
+-              <div className="bg-white h-24 p-4 flex flex-row justify-between overflow-hidden gap-4">
+-                <h4 className=" line-clamp-2 break-all h-max">{item.name}</h4>
+-                <button
+-                  className="py-1 text-primary hover:text-secondary px-3 text-lg h-max border-primary border rounded-full"
+-                  onClick={() => setSelectedCharities(item.id)}
+-                >
+-                  Donate
+-                </button>
+-              </div>
+-            </div>
+-          ))}
++            );
++          })}
+         </div>
+       )}
+     </div>
+diff --git a/challenge-react/src/components/DonationPayment.js b/challenge-react/src/components/DonationPayment.js
+index 9269a75..b3b2e32 100644
+--- a/challenge-react/src/components/DonationPayment.js
++++ b/challenge-react/src/components/DonationPayment.js
+@@ -1,58 +1,38 @@
+ import React from 'react';
+-import { buttonAnimation } from '../style_constant';
+-
+ export default function DonationPayment(props) {
+-  const {
+-    item,
+-    selectedAmount,
+-    setSelectedAmount,
+-    selectedCharities,
+-    setSelectedCharities,
+-  } = props;
++  const { currency, handlePay, selectedAmount, setSelectedAmount } = props;
+   const paymentOptions = [10, 20, 50, 100, 500];
+ 
+   return (
+-    <div
+-      className={`absolute inset-0 w-full h-full flex flex-col items-center ${item.id === selectedCharities ? '' : 'hidden'}`}
+-    >
+-      <img
+-        src="icons/close_icon.svg"
+-        alt="close_icon"
+-        className={`absolute right-0 p-2 m-2 hover:bg-gray-400 rounded-full ${buttonAnimation}`}
+-        onClick={() => setSelectedCharities(null)}
+-        draggable="false"
+-      />
+-      <div className="flex-1  w-full">
+-        <div className="grid grid-cols-2 gap-4 p-10 h-full w-full">
+-          {paymentOptions.map((amount, idx) => (
++    <>
++      <h4 className="text-black font-semibold mb-10 lg:mb-6">{`Select the amount to donate (${currency})`}</h4>
++      <div className="grid grid-cols-2 gap-6 lg:gap-4 w-full">
++        {paymentOptions.map((amount, idx) => (
++          <div
++            key={idx}
++            className={'flex justify-center items-center cursor-pointer'}
++            onClick={() => setSelectedAmount(amount)}
++          >
+             <div
+-              key={idx}
+-              className={'flex justify-center items-center cursor-pointer'}
+-              onClick={() => setSelectedAmount(amount)}
++              className={`${selectedAmount === amount ? 'bg-secondary' : 'bg-drop'} w-full p-6 lg:p-2 border-2 text-center border-primary rounded-full`}
+             >
+-              <div
+-                className={`${selectedAmount === amount ? 'bg-secondary' : 'bg-drop'} w-full p-2 border-2 text-center border-primary rounded-full`}
++              <h5
++                className={
++                  selectedAmount === amount ? 'text-white' : 'text-primary'
++                }
+               >
+-                <h5
+-                  className={
+-                    selectedAmount === amount ? 'text-white' : 'text-primary'
+-                  }
+-                >
+-                  {amount}
+-                </h5>
+-              </div>
++                {amount}
++              </h5>
+             </div>
+-          ))}
+-        </div>
+-      </div>
+-      <div className="flex justify-center items-center w-full h-24">
+-        <button
+-          className="absolute w-1/2 bg-primary text-white hover:opacity-80 p-2 text-lg h-max rounded-full"
+-          onClick={() => {}}
+-        >
+-          Donate
+-        </button>
++          </div>
++        ))}
+       </div>
+-    </div>
++      <button
++        className="w-full bg-primary text-white hover:opacity-80  p-6 lg:p-2 mt-10 text-lg h-max rounded-full"
++        onClick={handlePay}
++      >
++        <h4>Donate</h4>
++      </button>
++    </>
+   );
+ }
+diff --git a/challenge-react/src/components/ToastComponent.js b/challenge-react/src/components/ToastComponent.js
+new file mode 100644
+index 0000000..6efd565
+--- /dev/null
++++ b/challenge-react/src/components/ToastComponent.js
+@@ -0,0 +1,32 @@
++import React from 'react';
++import { toast } from 'react-toastify';
++
++export const ToastComponent = (message, type) => {
++  const Content = () => (
++    <>
++      <div className="grid grid-cols-8 w-full">
++        <div className="col-span-1 flex items-center justify-center">
++          {type === 'success' ? (
++            <img
++              src="icons/circle-check.svg"
++              alt="circle-check"
++              draggable="false"
++            />
++          ) : (
++            <img src="icons/circle-x.svg" alt="circle-x" draggable="false" />
++          )}
++        </div>
++        <div className="col-span-7 flex w-full flex-col pl-2 text-base text-black md:text-xl">
++          <p>{message}</p>
++        </div>
++      </div>
++    </>
++  );
++  toast.dismiss();
++  toast(<Content />, {
++    className: `rounded-5 border-l-8 min-w-[360px] ${
++      type === 'success' ? 'border-green-600' : 'border-red-600'
++    }`,
++    closePosition: 'center',
++  });
++};
+diff --git a/challenge-react/src/index.css b/challenge-react/src/index.css
+index 11bac9a..55456d0 100644
+--- a/challenge-react/src/index.css
++++ b/challenge-react/src/index.css
+@@ -10,18 +10,18 @@ body {
+ 
+ @layer base {
+   h1 {
+-    @apply text-4xl md:text-5xl;
++    @apply text-7xl lg:text-5xl;
+   }
+   h2 {
+     @apply text-4xl;
+   }
+   h3 {
+-    @apply text-3xl;
++    @apply text-6xl lg:text-3xl;
+   }
+   h4 {
+-    @apply text-5xl md:text-2xl;
++    @apply text-5xl lg:text-2xl;
+   }
+   h5 {
+-    @apply text-xl;
++    @apply text-4xl lg:text-xl;
+   }
+ }
+diff --git a/challenge-react/src/index.js b/challenge-react/src/index.js
+index 616d0ca..da6edb0 100644
+--- a/challenge-react/src/index.js
++++ b/challenge-react/src/index.js
+@@ -4,8 +4,23 @@ import { Provider } from 'react-redux';
+ import App from './App';
+ import store from './store';
+ import './index.css';
++import { ToastContainer } from 'react-toastify';
++import 'react-toastify/dist/ReactToastify.css';
++
+ render(
+   <Provider store={store}>
++    <ToastContainer
++      position="top-center"
++      autoClose={3000}
++      hideProgressBar={true}
++      newestOnTop={false}
++      closeOnClick
++      rtl={false}
++      pauseOnFocusLoss
++      draggable
++      pauseOnHover
++      fullWidth
++    />
+     <App />
+   </Provider>,
+   document.getElementById('root'),
+diff --git a/challenge-react/src/style_constant.js b/challenge-react/src/style_constant.js
+index cd2a43d..fa99b4e 100644
+--- a/challenge-react/src/style_constant.js
++++ b/challenge-react/src/style_constant.js
+@@ -1,3 +1,3 @@
+-const buttonAnimation =
+-  'cursor-pointer transition-all duration-500 ease-in-out';
+-export { buttonAnimation };
++const absoluteCard = 'absolute inset-0 h-full w-full';
++const buttonAnimation = 'transition-all duration-500 ease-in-out';
++export { absoluteCard, buttonAnimation };
+diff --git a/challenge-react/tailwind.config.js b/challenge-react/tailwind.config.js
+index b8a3721..ee91141 100644
+--- a/challenge-react/tailwind.config.js
++++ b/challenge-react/tailwind.config.js
+@@ -1,7 +1,7 @@
+ /** @type {import('tailwindcss').Config} */
+ 
+ module.exports = {
+-  content: ['./src/**/*.{js,jsx}'],
++  content: ['./src/**/*.{js,jsx,ts,tsx}'],
+   theme: {
+     extend: {
+       textColor: {
+@@ -20,12 +20,6 @@ module.exports = {
+         secondary: '#0588EB',
+       },
+     },
+-    screens: {
+-      sm: '640px',
+-      md: '768px',
+-      lg: '1024px',
+-      xl: '1280px',
+-    },
+   },
+   plugins: [],
+ };
+diff --git a/challenge-react/webpack.config.js b/challenge-react/webpack.config.js
+index 3c4646b..daa6d0c 100644
+--- a/challenge-react/webpack.config.js
++++ b/challenge-react/webpack.config.js
+@@ -28,15 +28,15 @@ const config = {
+         },
+       },
+       {
+-        test: /\.css$/,
++        test: /\.css$/i, // To handle .css files
+         use: [
+-          'style-loader',
+-          'css-loader',
++          'style-loader', // Injects CSS into the DOM
++          'css-loader', // Resolves @import and url() paths
+           {
+-            loader: 'postcss-loader',
++            loader: 'postcss-loader', // PostCSS loader
+             options: {
+               postcssOptions: {
+-                plugins: ['tailwindcss', 'autoprefixer'],
++                plugins: [require('tailwindcss'), require('autoprefixer')],
+               },
+             },
+           },
+diff --git a/challenge-react/yarn.lock b/challenge-react/yarn.lock
+index 0f0fc1f..c3695ae 100644
+--- a/challenge-react/yarn.lock
++++ b/challenge-react/yarn.lock
+@@ -2761,6 +2761,11 @@ clone-response@^1.0.2:
+   dependencies:
+     mimic-response "^1.0.0"
+ 
++clsx@^1.1.1:
++  version "1.2.1"
++  resolved "https://registry.yarnpkg.com/clsx/-/clsx-1.2.1.tgz#0ddc4a20a549b59c93a4116bb26f5294ca17dc12"
++  integrity sha512-EcR6r5a8bj6pu3ycsa/E/cKVGuTgZJZdsyUYHOksG/UHIiKfjxzRxYJpyVBwYaQeOvghal9fcc4PidlgzugAQg==
++
+ co@^4.6.0:
+   version "4.6.0"
+   resolved "https://registry.yarnpkg.com/co/-/co-4.6.0.tgz#6ea6bdf3d853ae54ccb8e47bfa0bf3f9031fb184"
+@@ -6998,6 +7003,13 @@ react-redux@^7.2.2:
+     prop-types "^15.7.2"
+     react-is "^16.13.1"
+ 
++react-toastify@8.0.3:
++  version "8.0.3"
++  resolved "https://registry.yarnpkg.com/react-toastify/-/react-toastify-8.0.3.tgz#7fbf65f69ec357aab8dd03c1496f9177aa92409a"
++  integrity sha512-rv3koC7f9lKKSkdpYgo/TGzgWlrB/aaiUInF1DyV7BpiM4kyTs+uhu6/r8XDMtBY2FOIHK+FlK3Iv7OzpA/tCA==
++  dependencies:
++    clsx "^1.1.1"
++
+ react@^17.0.1:
+   version "17.0.1"
+   resolved "https://registry.yarnpkg.com/react/-/react-17.0.1.tgz#6e0600416bd57574e3f86d92edba3d9008726127"
+-- 
+2.39.5 (Apple Git-154)
+
