@@ -8,12 +8,12 @@ export default function DonationAmountDisplay() {
 
   return (
     <div className="flex flex-col gap-2 justify-center items-center">
-      <h4 className="">All donations</h4>
+      <h2>All donations</h2>
       <div className="flex flex-row gap-2 justify-center items-center">
-        <h2 className="font-medium text-primary">
+        <h1 className="font-semibold text-primary">
           {NumFormat(donationSelector)}
-        </h2>
-        <h5 className="font-light">THB</h5>
+        </h1>
+        <h5>THB</h5>
       </div>
     </div>
   );
